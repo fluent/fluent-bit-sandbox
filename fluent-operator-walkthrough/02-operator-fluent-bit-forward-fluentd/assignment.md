@@ -154,7 +154,7 @@ apiVersion: fluentd.fluent.io/v1alpha1
 kind: FluentdConfig
 metadata:
   name: namespace-fluentd-config
-  namespace: kube-system
+  namespace: fluent
   labels:
     config.fluentd.fluent.io/enabled: "true"
 spec:
@@ -167,7 +167,7 @@ apiVersion: fluentd.fluent.io/v1alpha1
 kind: Output
 metadata:
   name: namespace-fluentd-output-es
-  namespace: kube-system
+  namespace: fluent
   labels:
     output.fluentd.fluent.io/scope: "namespace"
     output.fluentd.fluent.io/enabled: "true"
