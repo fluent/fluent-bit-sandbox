@@ -1,0 +1,1 @@
+curl https://gist.githubusercontent.com/agup006/b936d299c11b60283bdaf05a12e334eb/raw/b87905c7ea1e21745dba87233666135ee61d0087/apache-access.log >> /var/log/access.log

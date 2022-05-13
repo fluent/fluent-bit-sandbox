@@ -1,0 +1,34 @@
+slug: fluentcon-eu-2022
+id: byrkn6tzidr6
+type: track
+title: 'Fluent Bit Hands-on Workshop: Getting started with Fluent Bit and Metrics
+  with Prometheus'
+teaser: Learn the new metric capabilities within Fluent Bit and how it integrates
+  with Prometheus
+description: |-
+  Fluent Bit is a powerful, lightweight, log and metric processor that can send data to destinations like Prometheus, Kafka, Splunk, Elasticsearch, OpenSearch, Datadog, and [more](https://docs.fluentbit.io/outputs).
+
+  In this 101 series we will focus on the following:
+
+  1. Using Fluent Bit to collect system metrics
+  2. Fluent Bit system metrics to Prometheus via Remote Write
+  3. Fluent Bit internal metrics to Prometheus
+  4. Fluent Bit custom scraping Prometheus metrics
+icon: https://fluentbit.io/assets/img/logo1-default.png
+level: beginner
+tags:
+- fluent-bit
+- ' fluentd'
+- ' introduction'
+- ' observability'
+- ' logs'
+- ' metrics'
+- ' prometheus'
+owner: Fluent
+developers:
+- anurag@calyptia.com
+private: false
+published: true
+maintenance: true
+skipping_enabled: true
+checksum: "10317164958642655746"

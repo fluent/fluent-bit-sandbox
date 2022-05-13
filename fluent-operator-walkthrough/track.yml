@@ -1,0 +1,36 @@
+slug: fluent-operator-walkthrough
+id: 72ea3bedya1z
+type: track
+title: 'Fluent Operator Hands-on Workshop: initial walkthrough'
+teaser: A simple walkthrough of how to use the Fluent Operator to send to various
+  outputs.
+description: |
+  Fluent Operator Walkthrough
+  ===========================
+
+  Based on https://github.com/kubesphere-sigs/fluent-operator-walkthrough.git, this is a simple walkthrough of how to use the Fluent Operator to dynamically deploy and control both FluentD and Fluent Bit automatically.
+
+  The track will show you examples of how to deploy the Fluent Operator to send logs to tools like Loki, Elasticsearch and Kafka.
+
+  A single node Kubernetes cluster is used to demonstrate everything for this track.
+icon: https://fluentbit.io/assets/img/logo1-default.png
+level: beginner
+tags:
+- fluent-bit
+- ' fluentd'
+- ' introduction'
+- ' fluent-operator'
+- ' loki'
+- ' elasticsearch'
+- ' kafka'
+- ' logs'
+- ' observability'
+- ' kubernetes'
+- ' operator'
+owner: Fluent
+developers:
+- pat@calyptia.com
+private: false
+published: true
+skipping_enabled: true
+checksum: "5362290852861151483"
