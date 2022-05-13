@@ -385,7 +385,7 @@ spec:
       enableRuby: true
       records:
       - key: kubernetes_ns
-        value: ${record["kubernetes"]["namespace_name"]}
+        value: \${record["kubernetes"]["namespace_name"]}
 ---
 apiVersion: fluentd.fluent.io/v1alpha1
 kind: ClusterOutput
@@ -442,7 +442,7 @@ spec:
       enableRuby: true
       records:
       - key: kubernetes_ns
-        value: ${record["kubernetes"]["namespace_name"]}
+        value: \${record["kubernetes"]["namespace_name"]}
 ---
 apiVersion: fluentd.fluent.io/v1alpha1
 kind: ClusterOutput
