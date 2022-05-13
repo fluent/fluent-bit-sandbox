@@ -1,0 +1,26 @@
+version: "3"
+containers:
+- name: m3db
+  image: quay.io/m3db/m3dbnode:v1.1.0
+  ports:
+  - 7201
+  - 7203
+  - 7204
+  - 7507
+  memory: 4096
+- name: prometheus
+  image: prom/prometheus:latest
+  ports:
+  - 9090
+  memory: 512
+- name: grafana
+  image: grafana/grafana-oss:latest-ubuntu
+  shell: /bin/bash
+  ports:
+  - 3000
+  memory: 256
+- name: fluent-bit-sandbox
+  image: fluent/fluent-bit:1.9.1-debug
+  cmd: /bin/bash
+  shell: /bin/bash
+  memory: 256
