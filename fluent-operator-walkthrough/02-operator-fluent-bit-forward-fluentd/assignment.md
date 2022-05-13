@@ -13,6 +13,16 @@ tabs:
   type: code
   hostname: kubernetes-vm
   path: /root/fluent-operator-walkthrough
+- title: Kibana
+  type: service
+  hostname: kubernetes-vm
+  port: 30002
+  new_window: true
+- title: Grafana
+  type: service
+  hostname: kubernetes-vm
+  port: 30001
+  new_window: true
 difficulty: basic
 timelimit: 1200
 ---
@@ -45,6 +55,13 @@ kubectl apply -f ~/fluent-operator-walkthrough/fluent-bit-inputs.yaml
 ```
 
 See the Git repo for details on how to access logs, etc. from the destinations.
+
+If you deploy Kibana then also use the service file to make it accessible from the tab above (same if you use Grafana which is done in the first challenge):
+
+```shell
+kubectl apply -f ./kibana-service.yaml
+kubectl apply -f ./grafana-service.yaml
+```
 
 Set up forwarding from Fluent Bit to Fluentd
 ============================================
