@@ -129,14 +129,18 @@ curl -X POST -d 'json={"foo":"bar"}' http://<localhost:9880>/app.log
 With a separate terminal you can tail the logs of the Fluentd pod:
 
 ```shell
-kubectl -n fluent logs -f fluentd-0
+kubectl -n fluent logs -f fluentd-http-0
 ```
 
 View the Fluentd configuration
 ==============================
 
 ```shell
-kubectl -n fluent get secrets fluentd-config -ojson | jq '.data."app.conf"' | awk -F '"' '{printf $2}' | base64 --decode
+kubectl -n fluent get secrets fluentd-http-config -o json | jq '.data."app.conf"' | awk -F '"' '{printf $2}' | base64 --decode
+```
+
+You should see output like this
+```
 ---
 <source>
   @type  forward
