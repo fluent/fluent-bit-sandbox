@@ -59,6 +59,23 @@ spec:
   selector:
     app: kibana
   type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: elasticsearch-tab
+  managedFields:
+  name: elasticsearch-tab
+  namespace: elastic
+spec:
+  ports:
+  - nodePort: 30003
+    port: 9200
+    protocol: TCP
+  selector:
+    app: elasticsearch-master
+  type: NodePort
 EOF
 
 cat <<EOF > /root/fluent-operator-walkthrough/fluent-bit-inputs.yaml
