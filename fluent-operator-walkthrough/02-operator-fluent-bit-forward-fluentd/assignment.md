@@ -44,6 +44,8 @@ We also need to ensure Fluent Bit is running to pick up logs:
 kubectl apply -f ~/fluent-operator-walkthrough/fluent-bit-inputs.yaml
 ```
 
+See the Git repo for details on how to access logs, etc. from the destinations.
+
 Set up forwarding from Fluent Bit to Fluentd
 ============================================
 
@@ -141,6 +143,61 @@ kubectl -n fluent get statefulset
 kubectl -n fluent get fluentd
 kubectl -n fluent get clusterfluentdconfig.fluentd.fluent.io
 kubectl -n fluent get clusteroutput.fluentd.fluent.io
+```
+
+Wait a few minutes and then you should be able to query ES for the logs:
+```shell
+ubectl -n elastic exec -it elasticsearch-master-0 -c elasticsearch --  curl -X GET "localhost:9200/fluent-log*/_search?pretty" -H 'Content-Type: application/json' -d '{
+   "size" : 0,
+   "aggs" : {
+      "kubernetes_ns": {
+         "terms" : {
+           "field": "kubernetes.namespace_name.keyword"
+         }
+      }
+   }
+}'
+```
+Output like the following should appear:
+```yaml
+{
+  "took" : 203,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 67,
+      "relation" : "eq"
+    },
+    "max_score" : null,
+    "hits" : [ ]
+  },
+  "aggregations" : {
+    "kubernetes_ns" : {
+      "doc_count_error_upper_bound" : 0,
+      "sum_other_doc_count" : 0,
+      "buckets" : [
+        {
+          "key" : "kafka",
+          "doc_count" : 46
+        },
+        {
+          "key" : "elastic",
+          "doc_count" : 18
+        },
+        {
+          "key" : "kube-system",
+          "doc_count" : 3
+        }
+      ]
+    }
+  }
+}
 ```
 FluentdConfig: Fluentd namespace-only configuration
 ====================================================
