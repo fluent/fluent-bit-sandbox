@@ -164,7 +164,7 @@ kubectl -n fluent get clusteroutput.fluentd.fluent.io
 
 Wait a few minutes and then you should be able to query ES for the logs:
 ```shell
-ubectl -n elastic exec -it elasticsearch-master-0 -c elasticsearch --  curl -X GET "localhost:9200/fluent-log*/_search?pretty" -H 'Content-Type: application/json' -d '{
+kubectl -n elastic exec -it elasticsearch-master-0 -c elasticsearch --  curl -X GET "localhost:9200/fluent-log*/_search?pretty" -H 'Content-Type: application/json' -d '{
    "size" : 0,
    "aggs" : {
       "kubernetes_ns": {
