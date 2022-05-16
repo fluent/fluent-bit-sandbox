@@ -131,6 +131,7 @@ spec:
   - default
   - kafka
   - elastic
+  - fluent
   clusterOutputSelector:
     matchLabels:
       output.fluentd.fluent.io/scope: "cluster"
@@ -228,7 +229,7 @@ apiVersion: fluentd.fluent.io/v1alpha1
 kind: FluentdConfig
 metadata:
   name: namespace-fluentd-config
-  namespace: kube-system
+  namespace: fluent 
   labels:
     config.fluentd.fluent.io/enabled: "true"
 spec:
@@ -241,7 +242,7 @@ apiVersion: fluentd.fluent.io/v1alpha1
 kind: Output
 metadata:
   name: namespace-fluentd-output-es
-  namespace: kube-system
+  namespace: fluent
   labels:
     output.fluentd.fluent.io/scope: "namespace"
     output.fluentd.fluent.io/enabled: "true"
@@ -281,6 +282,8 @@ spec:
   watchedNamespaces:
   - kube-system
   - default
+  - kafka
+  - elastic
   clusterOutputSelector:
     matchLabels:
       output.fluentd.fluent.io/scope: "hybrid"
@@ -357,7 +360,9 @@ metadata:
 spec:
   watchedNamespaces:
   - kube-system
-  - kubesphere-system
+  - default
+  - kafka
+  - elastic
   clusterOutputSelector:
     matchLabels:
       output.fluentd.fluent.io/enabled: "true"
