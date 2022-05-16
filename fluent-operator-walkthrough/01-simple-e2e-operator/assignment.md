@@ -98,3 +98,5 @@ kubectl -n fluent get clusteroutput.fluentbit.fluent.io
 ```
 
 Within a couple of minutes, you can double check the output in the Grafana (or your choice of tooling).
+
+> In Grafana's log browser window, input `{job="fluentbit"}` and then click `Run Query` to query K8s logs collected by FluentBit
