@@ -1,0 +1,50 @@
+---
+name: Push tracks to Instruqt on PR merge
+env:
+  ORGANIZATION_SLUG: Fluent
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+jobs:
+  push-tracks:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        track: [ "fluent-operator-walkthrough", "fluentcon-eu-2022" ]
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: Track Validate
+        run: |
+          docker run -e INSTRUQT_TOKEN=${{ secrets.INSTRUQT_TOKEN }} \
+            --workdir="/track" \
+            --mount type=bind,source="$(pwd)",target=/track \
+            instruqt/cli track validate
+        shell: bash
+        working-directory: ${{ matrix.track }}
+
+      - name: Track Push
+        run: |
+          docker run -e INSTRUQT_TOKEN=${{ secrets.INSTRUQT_TOKEN }} \
+            --workdir="/track" \
+            --mount type=bind,source="$(pwd)",target=/track \
+            instruqt/cli track push --force
+        shell: bash
+        working-directory: ${{ matrix.track }}
+
+      - name: Track Push
+        run: |
+          docker run -e INSTRUQT_TOKEN=${{ secrets.INSTRUQT_TOKEN }} \
+            --workdir="/track" \
+            --mount type=bind,source="$(pwd)",target=/track \
+            instruqt/cli track test --skip-fail-check
+        shell: bash
+        working-directory: ${{ matrix.track }}
