@@ -1,0 +1,31 @@
+slug: fluent-bit-getting-started-101
+id: gr2vrxk4o7ln
+type: track
+title: 'Fluent Bit 101: Getting Started with configuration and routing'
+teaser: Learn how Fluent Bit configuration is setup
+description: |-
+  Fluent Bit is a powerful, lightweight, log and metric processor that can send data to destinations like Kafka, Splunk, Elasticsearch, OpenSearch, Datadog, and [more](https://docs.fluentbit.io/outputs).
+
+  In this 101 series we will focus on the following:
+
+  1. Running Fluent Bit via command line
+  2. Configuring Fluent Bit to read from a file
+  3. Routing and tagging introduction
+  4. (Coming Soon) Reducing data and cost with filters
+  5. (Coming Soon) Routing data to multiple destinations
+icon: https://fluentbit.io/assets/img/logo1-default.png
+level: beginner
+tags:
+- fluent-bit
+- ' fluentd'
+- ' introduction'
+- ' observability'
+- ' logs'
+- ' metrics'
+owner: Fluent
+developers:
+- anurag@calyptia.com
+private: false
+published: true
+skipping_enabled: true
+checksum: "17769631275351920215"

@@ -1,0 +1,1 @@
+echo "export PATH=/fluent-bit/bin/:$PATH" >> .bashrc
