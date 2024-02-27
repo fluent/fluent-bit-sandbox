@@ -13,6 +13,16 @@ tabs:
   type: code
   hostname: kubernetes-vm
   path: /root/fluent-operator-walkthrough
+- title: Kibana
+  type: service
+  hostname: kubernetes-vm
+  port: 30002
+  new_window: true
+- title: Grafana
+  type: service
+  hostname: kubernetes-vm
+  port: 30001
+  new_window: true
 difficulty: basic
 timelimit: 1200
 ---
@@ -42,6 +52,15 @@ cd ~/fluent-operator-walkthrough
 We also need to ensure Fluent Bit is running to pick up logs:
 ```shell
 kubectl apply -f ~/fluent-operator-walkthrough/fluent-bit-inputs.yaml
+```
+
+See the Git repo for details on how to access logs, etc. from the destinations.
+
+If you deploy Kibana then also use the service file to make it accessible from the tab above (same if you use Grafana which is done in the first challenge):
+
+```shell
+kubectl apply -f ./kibana-service.yaml
+kubectl apply -f ./grafana-service.yaml
 ```
 
 Set up forwarding from Fluent Bit to Fluentd
@@ -112,6 +131,7 @@ spec:
   - default
   - kafka
   - elastic
+  - fluent
   clusterOutputSelector:
     matchLabels:
       output.fluentd.fluent.io/scope: "cluster"
@@ -141,6 +161,61 @@ kubectl -n fluent get statefulset
 kubectl -n fluent get fluentd
 kubectl -n fluent get clusterfluentdconfig.fluentd.fluent.io
 kubectl -n fluent get clusteroutput.fluentd.fluent.io
+```
+
+Wait a few minutes and then you should be able to query ES for the logs:
+```shell
+kubectl -n elastic exec -it elasticsearch-master-0 -c elasticsearch --  curl -X GET "localhost:9200/fluent-log*/_search?pretty" -H 'Content-Type: application/json' -d '{
+   "size" : 0,
+   "aggs" : {
+      "kubernetes_ns": {
+         "terms" : {
+           "field": "kubernetes.namespace_name.keyword"
+         }
+      }
+   }
+}'
+```
+Output like the following should appear:
+```yaml
+{
+  "took" : 203,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 67,
+      "relation" : "eq"
+    },
+    "max_score" : null,
+    "hits" : [ ]
+  },
+  "aggregations" : {
+    "kubernetes_ns" : {
+      "doc_count_error_upper_bound" : 0,
+      "sum_other_doc_count" : 0,
+      "buckets" : [
+        {
+          "key" : "kafka",
+          "doc_count" : 46
+        },
+        {
+          "key" : "elastic",
+          "doc_count" : 18
+        },
+        {
+          "key" : "kube-system",
+          "doc_count" : 3
+        }
+      ]
+    }
+  }
+}
 ```
 FluentdConfig: Fluentd namespace-only configuration
 ====================================================
@@ -207,6 +282,8 @@ spec:
   watchedNamespaces:
   - kube-system
   - default
+  - kafka
+  - elastic
   clusterOutputSelector:
     matchLabels:
       output.fluentd.fluent.io/scope: "hybrid"
@@ -283,7 +360,9 @@ metadata:
 spec:
   watchedNamespaces:
   - kube-system
-  - kubesphere-system
+  - default
+  - kafka
+  - elastic
   clusterOutputSelector:
     matchLabels:
       output.fluentd.fluent.io/enabled: "true"
@@ -344,126 +423,4 @@ kubectl -n fluent get clusterfluentdconfig
 kubectl -n fluent get fluentdconfig
 kubectl -n fluent get output.fluentd.fluent.io
 kubectl -n fluent get clusteroutput.fluentd.fluent.io
-```
-
-Route logs by namespace to different Kafka topics
-=================================================
-
-You can use a Fluentd filter to distribute logs to different topics based on namespace.
-
-```shell
-cat <<EOF | kubectl apply -f -
-apiVersion: fluentd.fluent.io/v1alpha1
-kind: ClusterFluentdConfig
-metadata:
-  name: cluster-fluentd-config-kafka
-  labels:
-    config.fluentd.fluent.io/enabled: "true"
-spec:
-  watchedNamespaces:
-  - kube-system
-  - default
-  clusterFilterSelector:
-    matchLabels:
-      filter.fluentd.fluent.io/type: "k8s"
-      filter.fluentd.fluent.io/enabled: "true"
-  clusterOutputSelector:
-    matchLabels:
-      output.fluentd.fluent.io/type: "kafka"
-      output.fluentd.fluent.io/enabled: "true"
----
-apiVersion: fluentd.fluent.io/v1alpha1
-kind: ClusterFilter
-metadata:
-  name: cluster-fluentd-filter-k8s
-  labels:
-    filter.fluentd.fluent.io/type: "k8s"
-    filter.fluentd.fluent.io/enabled: "true"
-spec:
-  filters:
-  - recordTransformer:
-      enableRuby: true
-      records:
-      - key: kubernetes_ns
-        value: ${record["kubernetes"]["namespace_name"]}
----
-apiVersion: fluentd.fluent.io/v1alpha1
-kind: ClusterOutput
-metadata:
-  name: cluster-fluentd-output-kafka
-  labels:
-    output.fluentd.fluent.io/type: "kafka"
-    output.fluentd.fluent.io/enabled: "true"
-spec:
-  outputs:
-  - kafka:
-      brokers: my-cluster-kafka-brokers.kafka.svc:9092
-      useEventTime: true
-      topicKey: kubernetes_ns
-EOF
-```
-
-Fluentd output buffering
-========================
-
-You can add a buffer to cache logs for the output plugins.
-
-```shell
-cat <<EOF | kubectl apply -f -
-apiVersion: fluentd.fluent.io/v1alpha1
-kind: ClusterFluentdConfig
-metadata:
-  name: cluster-fluentd-config-buffer
-  labels:
-    config.fluentd.fluent.io/enabled: "true"
-spec:
-  watchedNamespaces:
-  - kube-system
-  - default
-  clusterFilterSelector:
-    matchLabels:
-      filter.fluentd.fluent.io/type: "buffer"
-      filter.fluentd.fluent.io/enabled: "true"
-  clusterOutputSelector:
-    matchLabels:
-      output.fluentd.fluent.io/type: "buffer"
-      output.fluentd.fluent.io/enabled: "true"
----
-apiVersion: fluentd.fluent.io/v1alpha1
-kind: ClusterFilter
-metadata:
-  name: cluster-fluentd-filter-buffer
-  labels:
-    filter.fluentd.fluent.io/type: "buffer"
-    filter.fluentd.fluent.io/enabled: "true"
-spec:
-  filters:
-  - recordTransformer:
-      enableRuby: true
-      records:
-      - key: kubernetes_ns
-        value: ${record["kubernetes"]["namespace_name"]}
----
-apiVersion: fluentd.fluent.io/v1alpha1
-kind: ClusterOutput
-metadata:
-  name: cluster-fluentd-output-buffer
-  labels:
-    output.fluentd.fluent.io/type: "buffer"
-    output.fluentd.fluent.io/enabled: "true"
-spec:
-  outputs:
-  - stdout: {}
-    buffer:
-      type: file
-      path: /buffers/stdout.log
-  - elasticsearch:
-      host: elasticsearch-master.elastic.svc
-      port: 9200
-      logstashFormat: true
-      logstashPrefix: fluent-log-buffer-fd
-    buffer:
-      type: file
-      path: /buffers/es.log
-EOF
 ```
