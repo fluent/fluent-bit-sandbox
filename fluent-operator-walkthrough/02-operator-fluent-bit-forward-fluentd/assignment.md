@@ -229,7 +229,7 @@ apiVersion: fluentd.fluent.io/v1alpha1
 kind: FluentdConfig
 metadata:
   name: namespace-fluentd-config
-  namespace: fluent 
+  namespace: fluent
   labels:
     config.fluentd.fluent.io/enabled: "true"
 spec:
